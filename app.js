@@ -15,62 +15,46 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get("/", (req, res, next) => {
-    res.send("Welcome In REST API");
+    res.send("Welcome in REST API2");
 });
 
-// this get api will return all product data
-app.get("/products", (req, res, next) => {
-    // res.send("get request for product");
-
-    connection.query('SELECT * FROM products', (error, result) => {
+app.get("/employees", (req, res, next) => {
+    connection.query(`SELECT * FROM employees`, (error, result) => {
         if (error) throw error;
         res.json(result);
     });
 });
-// this get api will return single product data
-app.get("/products/:id", (req, res, next) => {
-    // res.send(`get request for single product id:${req.params.id}`);
-    connection.query(`SELECT * FROM products WHERE id=${req.params.id}`, (error, result) => {
+
+
+app.delete("/employees/:empno", (req, res, next) => {
+    connection.query(`DELETE FROM employees WHERE empno=${req.params.empno}`, (error, result) => {
         if (error) throw error;
-        res.json(result);
+        res.json("Employees deleted successfully");
     })
 });
 
-// this delete api will return all product data
-app.delete("/products/:id", (req, res, next) => {
-    // res.send(`delete request for single product id:${req.params.id}`);
-    connection.query(`DELETE FROM products WHERE id=${req.params.id}`, (error, result) => {
+app.post("/employees", (req, res, next) => {
+    const { name, salary, position, mode } = req.body;
+    const sqlquery = "INSERT INTO employees (name,price,company,quantity) VALUES(?,?,?,?)";
+
+    connection.query(sqlquery, [name, salary, position, mode], (error, result) => {
         if (error) throw error;
-        res.json("Products deleted successfully");
+        res.json("Employee Added Successfully");
     })
 });
 
-// this post api will return all product data
-app.post("/products", (req, res, next) => {
-    // res.send("post request for product");
-    const { name, price, company, quantity } = req.body;
-    const sqlquery = "INSERT INTO products (name,price,company,quantity) VALUES(?,?,?,?)";
+app.put("/employees/:empno", (req, res, next) => {
+    const { empno } = req.params;
+    const { name, salary, position, mode } = req.body;
+    const sqlquery = `UPDATE products SET name=?, salary=?, position=?, mode=? WHERE empno=${req.params.empno}`;
 
-    connection.query(sqlquery, [name, price, company, quantity], (error, result) => {
+    connection.query(sqlquery, [name, salary, position, mode], (error, result) => {
         if (error) throw error;
-        res.json("Product Added Successfully");
-    })
-});
-
-// this put api will return all product data
-app.put("/products/:id", (req, res, next) => {
-    // res.send("get request for product");
-    const { id } = req.params;
-    const { name, price, company, quantity } = req.body;
-    const sqlquery = `UPDATE products SET name=?, price=?, company=?, quantity=? WHERE id=${id}`;
-    
-    connection.query(sqlquery,[name,price,company,quantity],(error,result)=>{
-        if(error) throw error;
-        res.json("Product Updated Successfully");
+        res.json("Employee Updated Successfully");
     })
 
 });
 
 app.listen(port, () => {
-    console.log(`my rest api server started on ${host}:${port}`);
-})  
+    console.log(`My Rest Api server started on ${host}:${port}`)
+})
